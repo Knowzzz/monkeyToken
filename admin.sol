@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 /*
 Fonction utiles :
 ==================================================== OWNER ==============================================
----> listAdmin ==> lister les admins || A corriger
+---> listAdmin ==> lister les admins 
 ---> addAdmin ==> ajouter un admin 
 ---> delAdmin ==> retire l'admin choisi 
 ---> owner ==> renvoie l'owner du contrat
@@ -28,9 +28,7 @@ Fonction utiles :
 ---> renounceAdmin ==> se retirer des admins 
 
 ==========================================================================================================
-=================================================== A FAIRE ==============================================
----> Vérifier si une adresse est un admin
-==========================================================================================================
+
  */
 
 contract Admin is Ownable {
@@ -46,6 +44,13 @@ contract Admin is Ownable {
     }
 
     function addAdmin(address newAdmin) public onlyOwner {
+         bool _addAdmin = false;
+        for (uint i=0; i<admin.length; i++) {
+            if (admin[i] == newAdmin) {
+                _addAdmin = true;
+            }
+        }
+        require(_addAdmin == false);
         require(newAdmin != address(0), "l'adresse ne peut pas etre l'adresse 0");
     admin.push(newAdmin);
     }

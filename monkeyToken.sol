@@ -10,7 +10,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "https://github.com/Knowzzz/portfolioKnowz/blob/main/admin.sol"
 
-
 //=========================================================================================================//
 //=============================================== MONKEY TOKEN ============================================//
 //=========================================================================================================//
@@ -20,21 +19,19 @@ import "https://github.com/Knowzzz/portfolioKnowz/blob/main/admin.sol"
 /* 
 Fonction utiles : 
 =============================================== PUBLIC ================================================
----> transfer ==> transférer un token à une autre personne || A refaire
+--->  safeTransferFrom ==> transférer un token à une autre personne
 ---> balanceOf ==> voir le nombre de token qu'à un utilisateur
 ---> mint ==> minter un token
----> mintWhitelisted ==> minter un token lorsque nous sommes whitelist || A corriger
+---> mintWhitelisted ==> minter un token lorsque nous sommes whitelist 
 
 =============================================== ADMIN / OWNER ==============================================
----> addAddressWhitelist ==> ajouter une adresse en tant que whitelist 
----> delAddressWhitelist ==> retirer une adresse en tant que whitelist || A tester
+---> addTokenWhitelist ==> ajouter un token whitelist sur l'adresse voulu
 ---> pause / unpause ==> mettre pause / unpause au contrat 
 
 =============================================== OWNER =================================================
 --> setDepositAddress ==> changer d'adresse où se dépose l'argent
 
 =======================================================================================================
-============================================= TERMINE ================================================
 */
 
 contract MonkeyToken is ERC721, ERC721Enumerable, Pausable, Admin {
@@ -55,24 +52,8 @@ contract MonkeyToken is ERC721, ERC721Enumerable, Pausable, Admin {
   bool pauseOrNot = false;
 
   mapping(address => uint8) addressWhitelist;
-  address[] public wlAddress;
 
   
-
-  function listWlAddress() public view returns(uint) {
-      return wlAddress.length;
-  }
-
-  modifier isWlAddress() {
-      bool _isWlAddress = false;
-        for (uint i=0; i<wlAddress.length; i++) {
-            if (wlAddress[i] == msg.sender) {
-                _isWlAddress = true;
-            }
-        }
-        require(_isWlAddress == true, "L'adresse utilise n'est pas whitelisted");
-        _;
-  }
 
   function setDepositAddress(address payable to) public onlyOwner {
     depositAddress = to;
@@ -87,8 +68,9 @@ contract MonkeyToken is ERC721, ERC721Enumerable, Pausable, Admin {
       }
   }
 
-  function mintWhitelisted() public payable isWlAddress {
+  function mintWhitelisted() public payable {
     require(pauseOrNot == false);
+     require(addressWhitelist[msg.sender] > 0, "The address can no longer pre-order");
     require(msg.value == whitelistPrice, "Montant Invalide");
     depositAddress.transfer(whitelistPrice);
     addressWhitelist[msg.sender] -= 1;
@@ -97,21 +79,13 @@ contract MonkeyToken is ERC721, ERC721Enumerable, Pausable, Admin {
       }
     }
 
-    function addAddressWhitelist (address _wlAddress) public onlyAdmin {
-        require(_wlAddress != address(0), "l'adresse ne peut pas etre l'adresse 0");
-        wlAddress.push(_wlAddress);
+    function addTokenWhitelist(address[] memory _addresses) external onlyOwner {
+    for (uint256 i = 0; i < _addresses.length; i++) {
+      require(_addresses[i] != address(0), "Address cannot be 0.");
+      require(addressWhitelist[_addresses[i]] == 0, "Balance must be 0.");
+      addressWhitelist[_addresses[i]] = 1;
     }
-
-    function delAddressWhitelist (address _wlAddress) public onlyAdmin {
-        uint256 index;
-        for (uint i=0; i<wlAddress.length; i++) {
-            if (wlAddress[i] == _wlAddress) {
-                index = i;
-            }
-        }
-        admin[index] = wlAddress[wlAddress.length - 1];
-        wlAddress.pop(); 
-    }
+  }
 
   function pause() public onlyAdmin {
       require(pauseOrNot == false);
