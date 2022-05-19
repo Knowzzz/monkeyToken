@@ -6,5 +6,7 @@ Hello, this is where my portfolio is located with the different projects I have 
 
 - admin.sol : contract that allows the owner to define admins who can access the functions they want.
 
-- cryptoking : one of my solidity contract ideas
+- cryptoking.sol : one of my solidity contract ideas
+
+- escrow.sol : it's a basic escrow contract where one address can deposit money, and another can collect it and send the package 
 
