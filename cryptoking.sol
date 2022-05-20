@@ -25,8 +25,6 @@ contract Ownable {
 
 }
 
-pragma solidity ^0.8.13;
-
 contract CrytpoKing is Ownable {
 
   constructor() {
