@@ -10,3 +10,5 @@ Hello, this is where my portfolio is located with the different projects I have 
 
 - escrow.sol : it's a basic escrow contract where one address can deposit money, and another can collect it and send the package 
 
+- lotto.sol : in dev
+
