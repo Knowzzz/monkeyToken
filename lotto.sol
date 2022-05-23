@@ -24,6 +24,7 @@ contract Lotto is Ownable, ERC721 {
     uint256 totalLottos;
     mapping(uint => Lottos) lottos;
     mapping(address => uint) balance;
+    address payable ceo;
 
     function createLotto(string memory _name, address _depositAddress, string memory _winObject, uint _maxPlayers, bool _ended, uint _price) public onlyOwner {
         Lottos memory newLotto = Lottos(_maxPlayers, _winObject, _depositAddress, _name, _ended, _price);
@@ -35,23 +36,36 @@ contract Lotto is Ownable, ERC721 {
         require(entering.ended == false, "Loto is already finish");
         require(msg.value == entering.price, "Price not valid");
         require(msg.sender != address(0), "Your address must be different than address 0");
-        bool isAlreadyHere = false;
-        for (uint i=0; i<entering.length; i++) { //probleme here
+        bool isAlreadyRegister = false;
+        for (uint i=0; i<entering.length; i++) {
             if (entering[i] == msg.sender) {
-                isAlreadyHere = true;x
+                isAlreadyRegister = true;
             }
         }
-        require(isAlreadyHere == false);
-        entering.push(msg.sender); //problem here
+        require(isAlreadyRegister == false);
+        entering.push(msg.sender);
         entering.depositAddress.transfer(msg.value);
   }
 
-  function win(uint lottoId) public {
+  function random() private view returns (uint) {
+    return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players)));
+}
 
+  function win(uint lottoId) public onlyOwner {
+    Lottos memory entering = lottos[lottoId];
+    uint winner = random() % entering.length;
+    ceo.transfer(entering.depositAddress);
+    entering.ended = true;
+    lottos[lottoId] = entering;
 }
 
     function nbrLotto() public view returns (uint) {
         return totalLottos;
+    }
+
+    function withdraw(uint lottoId) public onlyOwner {
+        Lottos memory entering = lottos[lottoId];
+        ceo.transfer(entering.depositAddress);
     }
 
     function checkLotto(uint i) public view returns (uint, string memory, address, string memory, bool, uint) {
