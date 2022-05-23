@@ -2,14 +2,12 @@
 
 pragma solidity ^0.8.14;
 
-
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
 contract Lotto is Ownable, ERC721 {
 
-    constructor() ERC721("On Luck", "OL") {
+    constructor() () {
 
     }
 
@@ -48,7 +46,7 @@ contract Lotto is Ownable, ERC721 {
   }
 
   function random() private view returns (uint) {
-    return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, players)));
+    return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, lottos)));
 }
 
   function win(uint lottoId) public onlyOwner {
