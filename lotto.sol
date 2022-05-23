@@ -1,4 +1,6 @@
-pragma solidity ^0.8.13;
+//SPDX-License-Identifier: UNLICENSED
+
+pragma solidity ^0.8.14;
 
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
@@ -7,45 +9,59 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Lotto is Ownable, ERC721 {
 
-    constructor() {
+    constructor() ERC721("On Luck", "OL") {
 
     }
-
 
     struct Lottos {
         uint maxPlayers;
         string winObject;
         address depositAddress;
         string name;
-        uint id;
         bool ended;
+        uint price;
     }
+    uint256 totalLottos;
+    mapping(uint => Lottos) lottos;
+    mapping(address => uint) balance;
 
-    Lottos[] private lottos;
-    address payable[] public players;
-    mapping(address => uint balance);
-    uint public price;
-
-    function createLotto(uint _id, string _name, address _depositAddress, string _winObject, uint _maxPlayers, bool _ended) public onlyOwner {
-        Lottos memory newLotto = Lottos(_maxPlayers, _winObject, _depositAddress, _name, _id, _ended);
-        lottos.push(newLotto);
+    function createLotto(string memory _name, address _depositAddress, string memory _winObject, uint _maxPlayers, bool _ended, uint _price) public onlyOwner {
+        Lottos memory newLotto = Lottos(_maxPlayers, _winObject, _depositAddress, _name, _ended, _price);
+        lottos[totalLottos] = newLotto;
+        totalLottos++;
     }
+  function enter(uint lottoId) public payable {
+        Lottos memory entering = lottos[lottoId];
+        require(entering.ended == false, "Loto is already finish");
+        require(msg.value == entering.price, "Price not valid");
+        require(msg.sender != address(0), "Your address must be different than address 0");
+        bool isAlreadyHere = false;
+        for (uint i=0; i<entering.length; i++) {
+            if (entering[i] == msg.sender) {
+                isAlreadyHere = true;x
+            }
+        }
+        require(isAlreadyHere == false);
+        Lottos[lottoId] = entering;
+        entering.push(msg.sender);
+        entering.depositAddress.transfer(msg.value);
+  }
 
-    function enter(uint lottoId) public payable {
-        lottoId = lottos.Lottos.id;
-        require(lottos[lottoId].ended == false)
-    }
-
-    function totalLottos() public view returns (uint) {
-        return lottos.length;
-    }
-
-    function checkLotto(uint _id) public view returns (string memory) {
-        return lottos[_id].name;
-    }
-
-
-
-
+  function win(uint lottoId) public {
 
 }
+
+    function nbrLotto() public view returns (uint) {
+        return totalLottos;
+    }
+
+    function checkLotto(uint i) public view returns (uint, string memory, address, string memory, bool, uint) {
+        return (lottos[i].maxPlayers, lottos[i].winObject, lottos[i].depositAddress, lottos[i].name, lottos[i].ended, lottos[i].price); 
+    }
+    
+}
+
+
+
+
+
