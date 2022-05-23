@@ -36,14 +36,13 @@ contract Lotto is Ownable, ERC721 {
         require(msg.value == entering.price, "Price not valid");
         require(msg.sender != address(0), "Your address must be different than address 0");
         bool isAlreadyHere = false;
-        for (uint i=0; i<entering.length; i++) {
+        for (uint i=0; i<entering.length; i++) { //probleme here
             if (entering[i] == msg.sender) {
                 isAlreadyHere = true;x
             }
         }
         require(isAlreadyHere == false);
-        Lottos[lottoId] = entering;
-        entering.push(msg.sender);
+        entering.push(msg.sender); //problem here
         entering.depositAddress.transfer(msg.value);
   }
 
