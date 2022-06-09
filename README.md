@@ -10,5 +10,5 @@ Hello, this is where my portfolio is located with the different projects I have 
 
 - escrow.sol : it's a basic escrow contract where one address can deposit money, and another can collect it and send the package 
 
-- lotto.sol : in dev
+- lottoStorage.sol : It is a lotto contract, which uses the Chainlink oracle and API3 to generate a random number and which allows to trigger some functions 
 
